@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<block>
+    <name>throughput_measure</name>
+    <key>tensorflow_cc_throughput_measure</key>
+    <category>[tensorflow_cc]</category>
+    <import>import tensorflow_cc</import>
+    <make>tensorflow_cc.throughput_measure($type.fcn,$vlen)</make>
+    <param>
+            <name>IO Type</name>
+            <key>type</key>
+            <type>enum</type>
+            <option>
+                    <name>Complex</name>
+                    <key>complex</key>
+                    <opt>fcn:8</opt>
+            </option>
+            <option>
+                    <name>Float</name>
+                    <key>float</key>
+                    <opt>fcn:4</opt>
+            </option>
+            <option>
+                    <name>Int</name>
+                    <key>int</key>
+                    <opt>fcn:4</opt>
+            </option>
+            <option>
+                    <name>Short</name>
+                    <key>short</key>
+                    <opt>fcn:2</opt>
+            </option>
+            <option>
+                    <name>Byte</name>
+                    <key>byte</key>
+                    <opt>fcn:1</opt>
+            </option>
+    </param>
+    <param>
+        <name>Vec length</name>
+        <key>vlen</key>
+        <type>int</type>
+    </param>
+    <sink>
+            <name>in</name>
+            <type>$type</type>
+            <vlen>$vlen</vlen>
+    </sink>
+    <source>
+            <name>out</name>
+            <type>$type</type>
+            <vlen>$vlen</vlen>
+    </source>
+</block>
