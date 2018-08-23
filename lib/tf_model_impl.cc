@@ -74,7 +74,6 @@ namespace gr {
             // for checkpoint data remove ".meta"
             const std::string checkpoint_fn = model_meta_path.substr(0, model_meta_path.size()-5);
 
-            //std::cout << "Loading Tensorflow model from: " << graph_fn << std::endl;
             GR_LOG_INFO(d_logger, "Loading Tensorflow model from: ");
 
             // session configuration
