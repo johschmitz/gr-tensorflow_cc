@@ -25,16 +25,19 @@ How to train and run the example
 
 The example models can be found in the examples folder
 
-    cd examples
+    cd ../examples
 
 Training requires a working python Tensorflow environment.
 I assume that Anaconda is used
 
     conda activate tensorflow
 
-Then train and save the models
+Then train and the example model
 
     ./train_autoencoder.py
+
+Close the plots to complete the script, then save the encoder and decoder models separately for inference
+
     ./save_encoder_tf.py
     ./save_decoder_tf.py
 
@@ -42,10 +45,15 @@ Leave the Anaconda environment
 
     conda deactivate
 
-After setting some environment variables for GNU Radio companion with
+Make sure your environment variables are set correctly after leaving the conda environment
+
+    source ~/.bashrc
+
+Or simply use a second terminal.
+To avoid a full installation of the out-of-tree module you can set some additional environment variables with
 
     . environment_debug
 
-you can now run the models in GNU Radio
+you can now run the example models in GNU Radio Companion
 
-    gnuradio_companion autoencoder.grc
+    gnuradio-companion neural_transceiver.grc
