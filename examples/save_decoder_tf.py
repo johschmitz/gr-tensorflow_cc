@@ -3,6 +3,7 @@
 import tensorflow as tf
 from keras.layers import Input, Dense
 from keras.models import Model
+from keras_custom_layers import ArgMax
 
 from keras import backend as K
 import os
@@ -15,7 +16,8 @@ n_channel = 2
 # Define network structure
 from_channel = Input(shape=(n_channel,),name='input')
 inner_layer = Dense(M, activation='relu')(from_channel)
-output_bits = Dense(M, activation='softmax')(inner_layer)
+inner_layer = Dense(M, activation='softmax')(inner_layer)
+output_bits = ArgMax()(inner_layer)
 
 decoder = Model(from_channel, output_bits)
 # We need an extra identity in tensorflow for the output placeholder

@@ -31,7 +31,9 @@ to_channel = BatchNormalization(axis=-1, momentum=0.99, epsilon=0.001, center=Tr
 
 encoder = Model(input_bits, to_channel)
 # We need an extra identity in tensorflow for the input placeholder
+#output = Lambda(tf.identity,output_shape=(n_channel,), arguments=None, name = 'lambda_output')(to_channel)
 tf.identity(to_channel, name='output')
+
 print(encoder.summary())
 
 # Export directory
