@@ -35,21 +35,35 @@ class qa_tf_model (gr_unittest.TestCase):
 
     def test_001_t (self):
         # set up fg
-        num_two_bits = 1
-        self.src = blocks.vector_source_f([0, 1, 1, 0]*num_two_bits,vlen=2,repeat=False)
-        model_path = os.getcwd()+'/../examples/export/encoder/tf_model.meta'
-        self.tf = tf_cc.tf_model(model_path,'input',4,2,'output',4,2)
-        self.sink = blocks.vector_sink_f(vlen=2)
+        self.src = blocks.vector_source_i([0,]*1000,vlen=1,repeat=False)
+        model_path = os.getcwd()+'/../examples/export/transmitter/tf_model.meta'
+        self.tf = tf_cc.tf_model(model_path,'input',gr.sizeof_int,1,0 ,'output',gr.sizeof_gr_complex,8)
+        self.sink = blocks.vector_sink_c(vlen=8)
         self.tb.connect(self.src, (self.tf,0))
         self.tb.connect((self.tf,0), self.sink)
         self.tb.run()
         # check data
         result_data = self.sink.data()
-        expected_result=np.linalg.norm(np.array([[1/np.sqrt(2),1/np.sqrt(2)]]*2*num_two_bits),axis=1)
-        result_norm =np.linalg.norm(np.array(result_data).reshape([2*num_two_bits,2]),axis=1)
+        expected_result=[105]
+        #print(result_data)
         print(expected_result)
-        print(result_norm)
-        self.assertFloatTuplesAlmostEqual(expected_result, result_norm, 1)
+        self.assertFloatTuplesAlmostEqual(expected_result, result_data, 1)
+
+    def test_002_t (self):
+        # set up fg
+        self.src = blocks.vector_source_c([0,]*16*1000,vlen=16,repeat=False)
+        model_path = os.getcwd()+'/../examples/export/receiver/tf_model.meta'
+        self.tf = tf_cc.tf_model(model_path,'input',gr.sizeof_gr_complex,16, 7, 'output',gr.sizeof_int,1)
+        self.sink = blocks.vector_sink_i(vlen=1)
+        self.tb.connect(self.src, (self.tf,0))
+        self.tb.connect((self.tf,0), self.sink)
+        self.tb.run()
+        # check data
+        result_data = self.sink.data()
+        expected_result=[105]
+        print(result_data)
+        print(expected_result)
+        self.assertFloatTuplesAlmostEqual(expected_result, result_data, 1)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_tf_model, "qa_tf_model.xml")

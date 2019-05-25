@@ -48,6 +48,7 @@ namespace gr {
        */
       static sptr make(std::string model_meta_path,
                        std::string layer_in, size_t itemsize_in, size_t vlen_in,
+                       size_t overlap,
                        std::string layer_out, size_t itemsize_out, size_t vlen_out,
                        bool use_gpu=true);
     };

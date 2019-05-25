@@ -5,8 +5,8 @@
   <category>[tensorflow_cc]</category>
   <import>import tensorflow_cc</import>
   <make>tensorflow_cc.tf_model($model_meta_path,
-            $layer_in, $itemsize_in, $vlen_in,
-            $layer_out, $itemsize_out, $vlen_out,
+            $layer_in, $type_in.size, $vlen_in, $overlap,
+            $layer_out, $type_out.size, $vlen_out,
             $use_gpu)
   </make>
   <param>
@@ -20,13 +20,43 @@
     <type>string</type>
   </param>
   <param>
-    <name>Input itemsize</name>
-    <key>itemsize_in</key>
-    <type>int</type>
+    <name>Input Type</name>
+    <key>type_in</key>
+    <type>enum</type>
+    <option>
+        <name>Complex</name>
+        <key>complex</key>
+        <opt>size:gr.sizeof_gr_complex</opt>
+    </option>
+    <option>
+        <name>Float</name>
+        <key>float</key>
+        <opt>size:gr.sizeof_float</opt>
+    </option>
+    <option>
+        <name>Int</name>
+        <key>int</key>
+        <opt>size:gr.sizeof_int</opt>
+    </option>
+    <option>
+        <name>Short</name>
+        <key>short</key>
+        <opt>size:gr.sizeof_short</opt>
+    </option>
+    <option>
+        <name>Byte</name>
+        <key>byte</key>
+        <opt>size:gr.sizeof_char</opt>
+    </option>
   </param>
   <param>
     <name>Input vlen</name>
     <key>vlen_in</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Overlap</name>
+    <key>overlap</key>
     <type>int</type>
   </param>
   <param>
@@ -35,9 +65,34 @@
     <type>string</type>
   </param>
   <param>
-    <name>Output itemsize</name>
-    <key>itemsize_out</key>
-    <type>int</type>
+    <name>Output Type</name>
+    <key>type_out</key>
+    <type>enum</type>
+    <option>
+        <name>Complex</name>
+        <key>complex</key>
+        <opt>size:gr.sizeof_gr_complex</opt>
+    </option>
+    <option>
+        <name>Float</name>
+        <key>float</key>
+        <opt>size:gr.sizeof_float</opt>
+    </option>
+    <option>
+        <name>Int</name>
+        <key>int</key>
+        <opt>size:gr.sizeof_int</opt>
+    </option>
+    <option>
+        <name>Short</name>
+        <key>short</key>
+        <opt>size:gr.sizeof_short</opt>
+    </option>
+    <option>
+        <name>Byte</name>
+        <key>byte</key>
+        <opt>size:gr.sizeof_char</opt>
+    </option>
   </param>
   <param>
     <name>Output vlen</name>
@@ -61,12 +116,12 @@
   </param>
   <sink>
     <name>in</name>
-    <type>float</type>
+    <type>$type_in</type>
     <vlen>$vlen_in</vlen>
   </sink>
   <source>
     <name>out</name>
-    <type>float</type>
+    <type>$type_out</type>
     <vlen>$vlen_out</vlen>
   </source>
 </block>

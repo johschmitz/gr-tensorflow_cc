@@ -27,6 +27,7 @@
 #include <assert.h>
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/framework/tensor.h>
+#include <cmath>
 
 
 namespace gr {
@@ -35,12 +36,14 @@ namespace gr {
         tf_model::sptr
         tf_model::make(std::string model_meta_path,
                        std::string layer_in, size_t itemsize_in, size_t vlen_in,
+                       size_t overlap,
                        std::string layer_out, size_t itemsize_out, size_t vlen_out,
                        bool use_gpu)
         {
             return gnuradio::get_initial_sptr
                 (new tf_model_impl(model_meta_path,
                                    layer_in, itemsize_in, vlen_in,
+                                   overlap,
                                    layer_out, itemsize_out, vlen_out,
                                    use_gpu));
         }
@@ -50,6 +53,7 @@ namespace gr {
          */
         tf_model_impl::tf_model_impl(std::string model_meta_path,
                                      std::string layer_in, size_t itemsize_in, size_t vlen_in,
+                                     size_t overlap,
                                      std::string layer_out, size_t itemsize_out, size_t vlen_out,
                                      bool use_gpu = true)
             : gr::sync_block("tf_model",
@@ -62,10 +66,12 @@ namespace gr {
             , d_itemsize_out(itemsize_out)
             , d_vlen_out(vlen_out)
             , d_use_gpu(use_gpu)
+            , d_overlap(overlap)
             , d_dtype_in(tensorflow::DT_INVALID)
             , d_dtype_out(tensorflow::DT_INVALID)
         {
             // model path, input and output layers need to be specified
+            set_history(1+std::ceil(overlap/vlen_in));
             assert(!model_meta_path.empty());
             assert(!layer_in.empty());
             assert(!layer_out.empty());
@@ -160,38 +166,62 @@ namespace gr {
 
             // prepare tensorflow inputs
             // tensor dimension 0 is the batch dimension, i.e., time dimension
-            tensorflow::Tensor in_tensor(d_dtype_in, {noutput_items, (int)d_vlen_in});
+            tensorflow::Tensor in_tensor(d_dtype_in, {noutput_items, (int)(d_vlen_in+d_overlap)});
             switch(d_dtype_in) {
                 // implement the most relevant data types,
                 // see tensorflow's types.proto for more
                 case tensorflow::DT_FLOAT: {
                     auto in_tensor_data = in_tensor.flat<float>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 case tensorflow::DT_INT32: {
                     auto in_tensor_data = in_tensor.flat<int>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 case tensorflow::DT_UINT8: {
                     auto in_tensor_data = in_tensor.flat<tensorflow::uint8>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 case tensorflow::DT_INT16: {
                     auto in_tensor_data = in_tensor.flat<tensorflow::int16>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 case tensorflow::DT_INT8: {
                     auto in_tensor_data = in_tensor.flat<tensorflow::int8>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 case tensorflow::DT_COMPLEX64: {
                     auto in_tensor_data = in_tensor.flat<tensorflow::complex64>().data();
-                    memcpy(in_tensor_data, in, noutput_items*d_itemsize_in*d_vlen_in);
+                    for(int i = 0; i < noutput_items; i++) {
+                        memcpy(in_tensor_data, in, d_itemsize_in*(d_vlen_in + d_overlap));
+                        in += d_itemsize_in*d_vlen_in;
+                        in_tensor_data += d_vlen_in + d_overlap;
+                    }
                     break;
                 }
                 default: {
@@ -248,7 +278,6 @@ namespace gr {
                     break;
                 }
             }
-
             // Tell runtime system how many output items we produced.
             return noutput_items;
         }

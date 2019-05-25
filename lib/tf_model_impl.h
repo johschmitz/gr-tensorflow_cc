@@ -40,6 +40,7 @@ namespace gr {
                 size_t d_itemsize_out;
                 size_t d_vlen_out;
                 bool d_use_gpu;
+                size_t d_overlap;
                 tensorflow::DataType d_dtype_in;
                 tensorflow::DataType d_dtype_out;
                 tensorflow::Session *d_session;
@@ -47,6 +48,7 @@ namespace gr {
             public:
                 tf_model_impl(std::string model_meta_path,
                               std::string d_layer_in, size_t itemsize_in, size_t vlen_in,
+                              size_t overlap,
                               std::string d_layer_out, size_t itemsize_out, size_t vlen_out,
                               bool use_gpu);
                 ~tf_model_impl();
